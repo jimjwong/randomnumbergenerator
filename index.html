@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta tags for character set and responsive design -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Page Title -->
+    <title>Random Number Generator</title>
+    
+    <!-- External Libraries & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* * Keyframe animation for the number cards.
+         * Creates a "pop-in" effect where cards scale up and fade in.
+         */
+        @keyframes pop-in {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .number-card {
+            /* Apply the animation to each number card */
+            animation: pop-in 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-indigo-200 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Application Container -->
+    <div class="w-full max-w-3xl text-center">
+        
+        <!-- Header Section -->
+        <header>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                Random Number Generator
+            </h1>
+            <p class="text-gray-600 mb-8 text-lg">Enter a range and step, then generate a random sequence!</p>
+        </header>
+
+        <!-- User Input Controls Section -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 max-w-xl mx-auto">
+            <div>
+                <label for="start-num" class="block text-sm font-medium text-gray-700 mb-1">Start</label>
+                <input type="number" id="start-num" value="1" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-center">
+            </div>
+            <div>
+                <label for="stop-num" class="block text-sm font-medium text-gray-700 mb-1">Stop</label>
+                <input type="number" id="stop-num" value="8" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-center">
+            </div>
+            <div>
+                <label for="step-num" class="block text-sm font-medium text-gray-700 mb-1">Step</label>
+                <input type="number" id="step-num" value="1" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-center">
+            </div>
+        </div>
+
+        <!-- Error Message Display Area -->
+        <div id="error-message" class="text-red-500 font-semibold mb-6 min-h-[24px]"></div>
+
+        <!-- Number Sequence Display Area -->
+        <main id="number-container" class="flex flex-wrap justify-center items-center gap-4 mb-10 min-h-[100px] md:min-h-[120px]">
+            <!-- Number cards will be dynamically generated here by JavaScript -->
+        </main>
+
+        <!-- Action Button -->
+        <button id="generate-btn" class="bg-purple-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-purple-700 transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300">
+            Generate New Sequence
+        </button>
+        
+        <!-- Footer / Credits Section -->
+        <footer class="mt-12">
+            <p class="text-sm text-gray-500">
+                Created by 
+                <a href="https://github.com/jimjwong" target="_blank" rel="noopener noreferrer" class="font-medium text-purple-600 hover:text-purple-800 underline">
+                    Jim Wong
+                </a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+    // --- MODULE-LEVEL SCOPE: CONFIGURATION & INITIALIZATION ---
+
+    /**
+     * Configuration object for the application.
+     * Centralizes constants for easier management.
+     */
+    const config = {
+        maxNumbers: 100, // The maximum amount of numbers that can be generated.
+        colors: [       // A vibrant color palette for the number cards.
+            'bg-red-400', 'bg-blue-400', 'bg-green-400', 'bg-yellow-400',
+            'bg-indigo-400', 'bg-pink-400', 'bg-orange-400', 'bg-teal-400',
+            'bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500',
+            'bg-indigo-500', 'bg-pink-500', 'bg-orange-500', 'bg-teal-500'
+        ]
+    };
+
+    /**
+     * DOM element references.
+     * Grouping these makes them easy to find and manage.
+     */
+    const dom = {
+        numberContainer: document.getElementById('number-container'),
+        generateBtn: document.getElementById('generate-btn'),
+        startInput: document.getElementById('start-num'),
+        stopInput: document.getElementById('stop-num'),
+        stepInput: document.getElementById('step-num'),
+        errorMessage: document.getElementById('error-message')
+    };
+
+    // --- CORE LOGIC & FUNCTIONS ---
+
+    /**
+     * Shuffles an array in place using the Fisher-Yates (aka Knuth) algorithm.
+     * This is an efficient and unbiased way to shuffle an array.
+     * @param {Array<any>} array The array to be shuffled.
+     * @returns {Array<any>} The same array, now shuffled.
+     */
+    function shuffle(array) {
+        let currentIndex = array.length;
+        let randomIndex;
+
+        // While there remain elements to shuffle.
+        while (currentIndex !== 0) {
+            // Pick a remaining element.
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            // And swap it with the current element.
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    /**
+     * Generates and displays the number sequence based on user input.
+     * @param {boolean} shouldShuffle - If true, the generated sequence will be randomized.
+     */
+    function generateAndDisplaySequence(shouldShuffle) {
+        // 1. Clear previous state (error messages and number cards)
+        dom.errorMessage.textContent = '';
+        dom.numberContainer.innerHTML = '';
+
+        // 2. Get and parse user inputs
+        const start = parseInt(dom.startInput.value, 10);
+        const stop = parseInt(dom.stopInput.value, 10);
+        const step = parseInt(dom.stepInput.value, 10);
+
+        // 3. Validate inputs and provide user feedback
+        if (isNaN(start) || isNaN(stop) || isNaN(step)) {
+            dom.errorMessage.textContent = 'Please enter valid numbers for all fields.';
+            return;
+        }
+        if (step <= 0) {
+            dom.errorMessage.textContent = 'Step must be a positive number.';
+            return;
+        }
+        if (start > stop) {
+            dom.errorMessage.textContent = 'Start number cannot be greater than the Stop number.';
+            return;
+        }
+
+        // 4. Generate the sequence of numbers
+        let numbers = [];
+        for (let i = start; i <= stop; i += step) {
+            numbers.push(i);
+        }
+
+        // 5. More validation based on the generated array
+        if (numbers.length === 0) {
+            dom.errorMessage.textContent = 'These settings produce no numbers. Try a different range.';
+            return;
+        }
+        if (numbers.length > config.maxNumbers) {
+            dom.errorMessage.textContent = `Too many numbers! Please choose a smaller range (max ${config.maxNumbers}).`;
+            return;
+        }
+
+        // 6. Shuffle the numbers if requested
+        if (shouldShuffle) {
+            numbers = shuffle(numbers);
+        }
+
+        // 7. Create and display the number cards
+        const shuffledColors = shuffle([...config.colors]);
+        numbers.forEach((number, index) => {
+            const card = document.createElement('div');
+            // Use modulo to loop through colors if there are more numbers than colors
+            const colorClass = shuffledColors[index % shuffledColors.length];
+            
+            card.className = `number-card w-20 h-20 md:w-24 md:h-24 flex items-center justify-center text-3xl md:text-4xl font-bold text-white rounded-2xl shadow-md transform transition-transform duration-200 hover:scale-110 ${colorClass}`;
+            card.textContent = number;
+            
+            // Set opacity to 0 for the animation and add a staggered delay
+            card.style.opacity = '0';
+            card.style.animationDelay = `${(index * 0.05).toFixed(2)}s`;
+
+            dom.numberContainer.appendChild(card);
+        });
+    }
+
+    // --- EVENT LISTENERS & INITIALIZATION ---
+
+    /**
+     * Initializes the application by setting up event listeners
+     * and generating the initial view.
+     */
+    function initialize() {
+        // Attach the click event listener to the generate button
+        dom.generateBtn.addEventListener('click', () => generateAndDisplaySequence(true));
+        
+        // Generate the initial, non-shuffled sequence when the page loads
+        generateAndDisplaySequence(false);
+    }
+
+    // Run the app initialization once the DOM is fully loaded
+    window.onload = initialize;
+
+    </script>
+
+</body>
+</html>
