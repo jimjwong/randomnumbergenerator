@@ -2,8 +2,7 @@
 
 A fun, interactive, and visually appealing web application for generating and shuffling custom sequences of numbers. Built with vanilla JavaScript and styled with Tailwind CSS, this single-page app provides a great user experience with smooth animations and a clean interface.
 
-**[Live Demo Link Here]** [<!-- Add a link to your live demo if you deploy it -->
-](https://jimjwong.github.io/randomnumbergenerator/)
+**[Live Demo Link Here]** [<!-- Check Live Demo Page Here -->](https://jimjwong.github.io/randomnumbergenerator/)
 
 ![Screenshot of the Random Number Generator App] <!-- It's highly recommended to add a screenshot of your app here -->
 
