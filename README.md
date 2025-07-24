@@ -2,9 +2,9 @@
 
 A fun, interactive, and visually appealing web application for generating and shuffling custom sequences of numbers. Built with vanilla JavaScript and styled with Tailwind CSS, this single-page app provides a great user experience with smooth animations and a clean interface.
 
-**[Live Demo Link Here]** [<!-- Check Live Demo Page Here -->](https://jimjwong.github.io/randomnumbergenerator/)
+[**Live Demo**](https://jimjwong.github.io/randomnumbergenerator/)
 
-![Screenshot of the Random Number Generator App] <!-- It's highly recommended to add a screenshot of your app here -->
+![Screenshot of the Random Number Generator App](Page_Preview.png)
 
 ## Features
 
@@ -24,15 +24,15 @@ A fun, interactive, and visually appealing web application for generating and sh
 
 ## Instructions
 
-1. **Set Your Range:** Enter your desired **Start**, **Stop**, and **Step** numbers in the input fields.
-2. **View the Sequence:** The app will immediately display the numbers in order.
-3. **Shuffle!:** Click the **"Generate New Sequence"** button to shuffle the numbers into a new, random order.
+1.  **Set Your Range:** Enter your desired **Start**, **Stop**, and **Step** numbers in the input fields.
+2.  **View the Sequence:** The app will immediately display the numbers in order.
+3.  **Shuffle!:** Click the **"Generate New Sequence"** button to shuffle the numbers into a new, random order.
 
 ## Getting Started
 
 No complex setup is required! To run this project locally, simply clone the repository and open the `index.html` file in your web browser.
 
 ```bash
-git clone [https://github.com/jimjwong/your-repo-name.git](https://github.com/jimjwong/your-repo-name.git)
-cd your-repo-name
+git clone [https://github.com/jimjwong/randomnumbergenerator.git](https://github.com/jimjwong/randomnumbergenerator.git)
+cd randomnumbergenerator
 # Open index.html in your browser
